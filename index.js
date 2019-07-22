@@ -44,10 +44,33 @@ app.put(`/users/:id`, (req,res)=>{
     occupation: req.body.occupation,
     avatar: req.body.avatar 
   }
+  if(!newUser.id) res.status(400).json({ msg: "New users require an id" })
   users.push(updateUser)
   res.json(users)
 })
 /* END - create routes here */
+app.put('/users/:id', (req, res) => {
+  const updateUser = req.body;
+  users.forEach(user => {
+    if(user._id === parseInt(req.params.id)) {
+      user.name = updateUser.name ? updateUser.name : user.name;
+      user.occupation = updateUser.occupation ? updateUser.occupation : user.occupation;
+      user.avatar = updateUser.avatar ? updateUser.avatar : user.avatar;
+      res.json({ msg: `User updated: ${user}` })
+    }
+  })
+})
+app.delete('/users/:id', (req, res) => {
+  const found = users.some(user => user._id == req.params.id)
+  if (found){
+    res.json({ 
+      msg: `User deleted`, 
+      users: users.filter(user => user._id == req.params.id)
+    })
+  } else {
+    res.status(404).json({msg: `User id ${req.params.id} not found.`})
+  }
+})
 
 app.listen(port, () => 
   console.log(`Example app listening on port ${port}!`))
